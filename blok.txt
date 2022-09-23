@@ -1,0 +1,9 @@
+Timur Kramár
+
+Položka:  tablet		Vyrobca:  apple			600.00
+Položka:  iphoneX		Vyrobca:  apple			250.00
+Položka:  mys		Vyrobca:  logitech			80.00
+Položka:  displej		Vyrobca:  samsung			239.00
+
+Spolu 1169.00 €
+Zostatok na účte: 1234.00 €

@@ -163,6 +163,26 @@ void nakup(PRODUKT* produkty, int prod_len, ZAKAZNIK* zakaznik){
     }
 }
 
+void uzavretie(ZAKAZNIK* zakaznik){
+    FILE* f = fopen("./blok.txt","w");
+    if(f == 0) {
+        printf("fopen failed to open bločik.txt");
+        exit(1);
+    }
+
+    fprintf(f, "%s %s\n\n", zakaznik->meno, zakaznik->priezvisko);
+    float suma = 0;
+    int i;
+    for (i=0; i<zakaznik->kosik_len; i++){
+        suma += zakaznik->kosik[i].cena; 
+        fprintf(f,"Položka:  %s\t\tVyrobca:  %s\t\t\t%.2f\n", 
+            zakaznik->kosik[i].nazov, zakaznik->kosik[i].vyrobca, zakaznik->kosik[i].cena
+        );
+    }
+    fprintf(f, "\nSpolu %.2f €\nZostatok na účte: %.2f €", suma, suma + zakaznik->rozpocet);
+    printf("\n\nPočas nákupu ste minuli %.2f € z %.2f €\n", suma, suma + zakaznik->rozpocet);
+    printf("Blok si nájdete v dokumente blok.txt");
+}
 
 
 int main(){
@@ -179,28 +199,9 @@ int main(){
     PRODUKT* produkty = populate_produkty(f, prod_len);
     ZAKAZNIK zakaznik = init_zakaznik();
     printf("\nAhoj %s %s\n", zakaznik.meno, zakaznik.priezvisko);
+
     nakup(produkty, prod_len, &zakaznik);
 
-
-    f = fopen("./bločik.txt","w");
-    if(f == 0) {
-        printf("fopen failed to open bločik.txt");
-        exit(1);
-    }
-
-    fprintf(f, "%s %s\n\n", zakaznik.meno, zakaznik.priezvisko);
-    float suma = 0;
-    int i;
-    for (i=0; i<zakaznik.kosik_len; i++){
-        suma += zakaznik.kosik[i].cena; 
-        fprintf(f,"Položka:  %s\t\tVyrobca:  %s\t\t\t%.2f\n", 
-            zakaznik.kosik[i].nazov, zakaznik.kosik[i].vyrobca, zakaznik.kosik[i].cena
-        );
-    }
-    fprintf(f, "\nSpolu %.2f €\nZostatok na účte: %.2f €", suma, suma + zakaznik.rozpocet);
-    printf("\n\nPočas nákupu ste minuli %.2f € z %.2f €", suma, suma + zakaznik.rozpocet);
-
-    
-
+    uzavretie(&zakaznik);
 
 }
