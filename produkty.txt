@@ -1,7 +1,7 @@
 10
 1 pocitac apple 12 1500
 2 mys logitech 31 80
-3 voda rajec 89 1.2
+3 voda rajec 0 1.2
 4 penazenka ph 25 12
 5 sluchadla apple 34 250
 6 tablet apple 9 600

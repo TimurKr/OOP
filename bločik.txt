@@ -1,0 +1,6 @@
+Timur KramarPoložka:voda Vyrobca:rajec Cena:1.20
+Položka:mys Vyrobca:logitech Cena:80.00
+Položka:tablet Vyrobca:apple Cena:600.00
+
+Spolu 681.20 €
+Zostatok na účte: 1260.00 €
