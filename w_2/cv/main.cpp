@@ -1,207 +1,234 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <iostream> 
+#include <iomanip>
+#include <string>
+#include <fstream>
 
-typedef struct {
-    int id;
-    char nazov[64];
-    char vyrobca[64];
-    int na_sklade;
+using namespace std; 
+
+#define FOUND 0
+#define NOT_FOUND 1
+#define FOUND_ERROR 2
+
+
+struct PRODUKT{
+    unsigned int id;
+    string nazov;
+    string vyrobca;
+    unsigned int na_sklade;
     float cena;
-} PRODUKT;
+};
 
-typedef struct {
-   char meno[64], priezvisko[64];
+struct ZAKAZNIK{
+   string meno, priezvisko;
    float rozpocet;
-   int kosik_len;
+   unsigned int kosik_len;
    PRODUKT kosik[64];
-} ZAKAZNIK;
+};
 
-PRODUKT* populate_produkty(FILE* f, int prod_len){
+void populate_produkty(string file_path, PRODUKT *produkty, int& num_prod){
 
-    PRODUKT* produkty = malloc(sizeof(PRODUKT)*prod_len);
+    fstream file;
+    file.open(file_path, ios::in);
 
-    int row;
-    for (row=0; row<prod_len; row+=1){
-        fscanf(f,"%u %s %s %d %f", 
-            &produkty[row].id,
-            produkty[row].nazov,
-            produkty[row].vyrobca,
-            &produkty[row].na_sklade,
-            &produkty[row].cena
-        );
+    if (!file.is_open()) {
+	    cout << "Subor sa nepodarilo otvorit!" << endl;
     }
-    return produkty;
+    
+    file >> num_prod;
+    cout << num_prod << endl;
+
+    produkty = new PRODUKT[num_prod];
+
+    for (int prod=0; prod<num_prod; prod+=1){
+        file 
+            >> produkty[prod].id
+            >> produkty[prod].nazov
+            >> produkty[prod].vyrobca
+            >> produkty[prod].na_sklade
+            >> produkty[prod].cena;
+    }
+    file.close();
 } 
 
 ZAKAZNIK init_zakaznik(){
     ZAKAZNIK zakaznik;
-    printf("\n\nVitajte v obchode.\n\nZadajte svoje meno: ");
-    scanf("%s", zakaznik.meno);
-    printf("Zadajte svoje priezvisko: ");
-    scanf("%s", zakaznik.priezvisko);
-    printf("Aký máš rozpočet? ");
-    scanf("%f", &zakaznik.rozpocet);
-    getchar();
+    cout << endl << endl 
+        << "Vitajte v obchode." << endl << endl 
+        << "Zadajte svoje meno: ";
+    cin >> zakaznik.meno;
+    cout << "Zadajte svoje priezvisko: ";
+    cin >> zakaznik.priezvisko;
+    cout << "Aký máš rozpočet? ";
+    cin >> zakaznik.rozpocet;
     zakaznik.kosik_len = 0;
     return zakaznik;
 }
 
-
-void nakup(PRODUKT* produkty, int prod_len, ZAKAZNIK* zakaznik){
+void nakup(PRODUKT* produkty, int prod_len, ZAKAZNIK& zakaznik){
 
     char volba;
-    char found;
-    int row;
-    while (0==0) {
-        printf("\nPrajete si vyhladávať podľa názvu[1], výrobcu[2], alebo chcete ukončiť nákup[3]?");
-        volba = getchar();
+    unsigned int found;
+    unsigned int row;
+    unsigned int id;
+    string search;
+    while (1) {
+        cout << "Prajete si vyhladávať podľa názvu[1], " 
+            << "výrobcu[2], alebo chcete ukončiť nákup[3]? ";
+        cin >> volba;
         if (volba == '1'){
-            char search[64];
-            printf("Zadajte názov hladaného produktu: ");
-            scanf("%s", search);
-            printf("Výsledky hladania produktov s názvom %s:\n", search);
+            cout << "Zadajte názov hladaného produktu: ";
+            cin >> search;
+            cout << "Výsleky hladania produktov s názvom " << search << endl;
 
-            found = 0;
+            found = NOT_FOUND;
             for (row=0; row<prod_len; row++){
-                if (!strcmp(produkty[row].nazov, search)){
-                    printf("id: %d\tnazov: %s\tvyrobca: %s\n", 
-                        produkty[row].id, produkty[row].nazov, produkty[row].vyrobca
-                    );
-                    found = 1;
+                cout << row;
+                if (produkty[row].nazov.find(search) != string::npos){
+                    cout
+                        << "id: " << produkty[row].id
+                        << "nazov: " << produkty[row].nazov
+                        << "vyrobca: " << produkty[row].vyrobca
+                        << endl;
+                    found = FOUND;
                 }
             }
+
             if (!found){
-                printf("Žiaden produkt nezodpovedá hladaniu.\n\n");
-                getchar();
+                cout << "Žiaden produkt nezodpovedá hladaniu." << endl << endl;
                 continue;
             }
 
         } else if (volba == '2') {
-            char search[64];
-            printf("Zadajte názov hladaného výrobcu: ");
-            scanf("%s", search);
-            printf("Výsledky hladania produktov s výrobcom %s:\n", search);
+            cout << "Zadajte názov hladaného výrobcu: ";
+            cin >> search;
+            cout << "Výsleky hladania produktov s výrobcom " << search << endl;
             
-            found = 0;
+            found = NOT_FOUND;
             for (row=0; row<prod_len; row++){
-                if (!strcmp(produkty[row].vyrobca, search)){
-                    printf("id: %d\tnazov: %s\tvyrobca: %s\n", 
-                        produkty[row].id, produkty[row].nazov, produkty[row].vyrobca
-                    );
-                    found = 1;
+                if (produkty[row].vyrobca.find(search) != string::npos){
+                    cout
+                        << "ID: " << produkty[row].id
+                        << "Nazov: " << produkty[row].nazov
+                        << "Vyrobca: " << produkty[row].vyrobca
+                        << endl;
+                    found = FOUND;
                 }
             }
-            if (!found) {
-                printf("Žiaden produkt nezodpovedá hladaniu.\n\n");
-                getchar();
+
+            if (!found){
+                cout << "Žiaden produkt nezodpovedá hladaniu." << endl << endl;
                 continue;
             }
 
         } else if (volba == '3') {
             return;
+
         } else {
-            printf("Zadajte valídnu volbu");
+            cout << "Zadajte valídnu volbu";
             volba = '0';
             continue;
         }
         
         int id;
-        printf("Zadajte id požadovaného produktu: ");
-        scanf("%d", &id);
-        getchar();
-        found = 0;
+        cout << "Zadajte id požadovaného produktu: ";
+        cin >> id;
+        
+        found = NOT_FOUND;
         for (row=0; row<prod_len; row++){
             if (produkty[row].id == id){
-                printf("id: %d\tnazov: %s\tvyrobca: %s\tMnožstvo na sklade: %d\tCena: %.2f €\n", 
-                        produkty[row].id, produkty[row].nazov, produkty[row].vyrobca,
-                        produkty[row].na_sklade, produkty[row].cena
-                );
-                if (zakaznik->rozpocet < produkty[row].cena) {
-                    printf("\nNa daný produkt nemáte dostatočný rozpočet.\nZostávajúci rozpočet %.2f\n",
-                        zakaznik->rozpocet
-                    );
-                    found = 2;
+                cout
+                    << "ID: " << produkty[row].id
+                    << "Nazov: " << produkty[row].nazov
+                    << "Vyrobca: " << produkty[row].vyrobca
+                    << "Množstvo na sklade: " << produkty[row].na_sklade
+                    << "Cena: " << produkty[row].cena
+                    << endl << endl;
+                
+                if (zakaznik.rozpocet < produkty[row].cena) {
+                    cout << "Na daný produkt nemáte dostatočný rozpočet." << endl 
+                    << "Zostávajúci rozpočet: " << zakaznik.rozpocet << endl;
+                    found = FOUND_ERROR;
                     break;
                 }
-                if (produkty[row].na_sklade <= 0){
-                    printf("\nDaný produkt nie je na sklade.\n");
-                    found = 2;
-                }
-                found = 1;
-                printf("Prajete si tovar zakúpiť? [y/n]");
-                scanf("%c", &volba);
-                getchar();
-                if (volba == 'y'){
-                    zakaznik->kosik[zakaznik->kosik_len] = produkty[row];
-                    zakaznik->kosik_len++;
-                    zakaznik->rozpocet -= produkty[row].cena;
-                    produkty[row].na_sklade -= 1;
-                    printf("Produkt bol vložený do košíka.\n");
-                } else {
-                    printf("Produkt nebol vložený do košíka.\n");
 
+                if (produkty[row].na_sklade <= 0){
+                    cout << "Daný produkt nie je na sklade";
+                    found = FOUND_ERROR;
+                    break;
+                }
+
+                found = FOUND;
+                cout << "Prajete si tovar zakúpiť? [y/n] ";
+                cin >> volba;
+
+                if (volba == 'y'){
+                    zakaznik.kosik[zakaznik.kosik_len] = produkty[row];
+                    zakaznik.kosik_len++;
+                    zakaznik.rozpocet -= produkty[row].cena;
+                    produkty[row].na_sklade -= 1;
+                    cout <<"Produkt bol vložený do košíka." << endl;
+                } else {
+                    cout <<"Produkt nebol vložený do košíka." << endl;
                 }
                 break;
             }
         }
-        if (found == 0){
-            printf("Nenašiel sa produkt s daným id.\n");
+        if (!found){
+            cout << "Nenašiel sa produkt s daným id." << endl;
             continue;
-        } else if (found == 2){
+        } else if (found == FOUND_ERROR) {
+            cout << "Nastala chyba." << endl;
             continue;
         }
 
         printf("\nVáš košík:\n");
-        for (row=0; row<zakaznik->kosik_len; row++){
-            printf("id: %d\tnazov: %s\tvyrobca: %s\tMnožstvo na sklade: %d\tCena: %.2f €\n", 
-                        zakaznik->kosik[row].id, zakaznik->kosik[row].nazov, zakaznik->kosik[row].vyrobca,
-                        zakaznik->kosik[row].na_sklade, zakaznik->kosik[row].cena
-                );
+        for (row=0; row<zakaznik.kosik_len; row++){
+            cout 
+                << "ID: " << zakaznik.kosik[row].id 
+                << "Názov: " << zakaznik.kosik[row].nazov 
+                << "Výrobca: " << zakaznik.kosik[row].vyrobca 
+                << "Množstvo na sklade: " << zakaznik.kosik[row].na_sklade 
+                << "Cena: " << zakaznik.kosik[row].cena
+                << endl; 
         }
-        printf("Zostávajúci rozpočet: %.2f\n", zakaznik->rozpocet);
+        printf("Zostávajúci rozpočet: %.2f\n", zakaznik.rozpocet);
     }
 }
 
-void uzavretie(ZAKAZNIK* zakaznik){
-    FILE* f = fopen("./blok.txt","w");
-    if(f == 0) {
-        printf("fopen failed to open bločik.txt");
-        exit(1);
-    }
-
-    fprintf(f, "%s %s\n\n", zakaznik->meno, zakaznik->priezvisko);
-    float suma = 0;
-    int i;
-    for (i=0; i<zakaznik->kosik_len; i++){
-        suma += zakaznik->kosik[i].cena; 
-        fprintf(f,"Položka:  %s\t\tVyrobca:  %s\t\t\t%.2f\n", 
-            zakaznik->kosik[i].nazov, zakaznik->kosik[i].vyrobca, zakaznik->kosik[i].cena
-        );
-    }
-    fprintf(f, "\nSpolu %.2f €\nZostatok na účte: %.2f €", suma, suma + zakaznik->rozpocet);
-    printf("\n\nPočas nákupu ste minuli %.2f € z %.2f €\n", suma, suma + zakaznik->rozpocet);
-    printf("Blok si nájdete v dokumente blok.txt");
-}
+// void uzavretie(ZAKAZNIK* zakaznik){
+//     FILE* f = fopen("./blok.txt","w");
+//     if(f == 0) {
+//         printf("fopen failed to open bločik.txt");
+//         exit(1);
+//     }
+//     fprintf(f, "%s %s\n\n", zakaznik->meno, zakaznik->priezvisko);
+//     float suma = 0;
+//     int i;
+//     for (i=0; i<zakaznik->kosik_len; i++){
+//         suma += zakaznik->kosik[i].cena; 
+//         fprintf(f,"Položka:  %s\t\tVyrobca:  %s\t\t\t%.2f\n", 
+//             zakaznik->kosik[i].nazov, zakaznik->kosik[i].vyrobca, zakaznik->kosik[i].cena
+//         );
+//     }
+//     fprintf(f, "\nSpolu %.2f €\nZostatok na účte: %.2f €", suma, suma + zakaznik->rozpocet);
+//     printf("\n\nPočas nákupu ste minuli %.2f € z %.2f €\n", suma, suma + zakaznik->rozpocet);
+//     printf("Blok si nájdete v dokumente blok.txt");
+// }
 
 
 int main(){
-    FILE* f = fopen("./produkty.txt","r");
-    if(f == 0) {
-        printf("fopen failed");
-        exit(1);
-    }
+    
+    PRODUKT* produkty;
+    int num_prod; 
+    populate_produkty("./produkty.txt", produkty, num_prod);
 
-    // Read numer of products
-    unsigned int prod_len;
-    fscanf(f, "%u\n", &prod_len);
-
-    PRODUKT* produkty = populate_produkty(f, prod_len);
     ZAKAZNIK zakaznik = init_zakaznik();
-    printf("\nAhoj %s %s\n", zakaznik.meno, zakaznik.priezvisko);
 
-    nakup(produkty, prod_len, &zakaznik);
+    cout << endl 
+        << "Vitaj " << zakaznik.meno << " " << zakaznik.priezvisko << endl;
 
-    uzavretie(&zakaznik);
+    nakup(produkty, num_prod, zakaznik);
+
+    // uzavretie(&zakaznik);
 
 }

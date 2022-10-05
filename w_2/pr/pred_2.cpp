@@ -113,7 +113,7 @@ int main() { //funkcia main, musí mat aj návratový typ
 //Príklad: otvorte subor file.dat na zápis na koniec súboru:
 
 	// fstream afile;
-	// afile.open("file.txt", ios::out);
+	// afile.open("file.txt", ios::app);
 	// afile.close();
 	
 
@@ -363,7 +363,7 @@ int main() { //funkcia main, musí mat aj návratový typ
 	// cout << a << endl;
 
 	// a = increaseConstRef(a); //nevytvára sa kópia, ale mám zabránené meniť premmenú
-	cout << a << endl;
+	// cout << a << endl;
 
 	return 0; //návratová hodnota funkcie main
 }
