@@ -1,6 +1,5 @@
-Timur Kramár 2
+Timur Kramar
 Položka: sluchadla	Výrobca: apple		Cena: 250
-Položka: tablet	Výrobca: apple		Cena: 600
 
-Cena spolu: 850
-Zostatok: 380
+Cena spolu: 250
+Zostatok: 1000
