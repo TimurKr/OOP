@@ -127,29 +127,21 @@ bool DateTime::operator < (const DateTime &d) {
 }
 
 bool DateTime::operator == (const DateTime &d) {
-    if (
-        year == d.year && 
+    return (year == d.year && 
         month == d.month && 
         day == d.day && 
         hour == d.hour && 
         minute == d.minute && 
-        second == d.second) 
-    { return true; }
-    else 
-    { return false; }
+        second == d.second);
 }
 
 bool DateTime::operator != (const DateTime &d) {
-    if (
-        year != d.year || 
+    return year != d.year || 
         month != d.month || 
         day != d.day || 
         hour != d.hour || 
         minute != d.minute || 
-        second != d.second) 
-    { return true; }
-    else 
-    { return false; }
+        second != d.second;
 }
 
 DateTime &DateTime::operator ++ ()
@@ -283,9 +275,12 @@ std::ostream &operator << (std::ostream &output, DateTime &d) {
 }
 
 int main(){ 
-    DateTime dt1 = DateTime("31.12.2022 23:58:56", ".", " ", ":");
+    DateTime dt1("31.12.2022 23:58:56", ".", " ", ":");
+    DateTime dt2("1.1.2023 0:1:56", ".", " ", ":");
+
     std::cout << dt1 << std::endl;
-    DateTime dt2 = dt1 + 500;
-    std::cout << dt2 - dt1 << std::endl;
+    std::cout << dt2 << std::endl;
+    int dt3 = dt2 - dt1;
+    std::cout << dt3 << std::endl;
 
 }
