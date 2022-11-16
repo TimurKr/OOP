@@ -71,6 +71,9 @@
         "iterator": "cpp",
         "__undef_macros": "cpp",
         "random": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "__tree": "cpp",
+        "list": "cpp",
+        "map": "cpp"
     }
 }
