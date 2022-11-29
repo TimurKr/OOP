@@ -53,3 +53,5 @@ dkms.conf
 src/main
 .gitignore
 .vscode/tasks.json
+
+build*
