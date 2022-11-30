@@ -32,7 +32,7 @@ Milionar::Milionar(QWidget *parent) : QMainWindow(parent), ui(new Ui::Milionar)
 
     option_buttons = {ui->opt1, ui->opt2, ui->opt3, ui->opt4};
 
-    std::ifstream input_file("/Users/timurkramar/Library/CloudStorage/OneDrive-Personal/MPM/Object oriented programing/OOP/w_10/cv/Milionar/questions.txt");
+    std::ifstream input_file("/Users/timurkramar/Library/CloudStorage/OneDrive-Personal/MPM/OOP/OOP/w_10/cv/Milionar/questions.txt");
     if (! input_file.is_open() ) {
         throw 1;
     }

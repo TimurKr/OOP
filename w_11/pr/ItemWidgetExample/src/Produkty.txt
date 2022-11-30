@@ -1,0 +1,101 @@
+20
+1
+Cestny bicykel
+TRIBAN
+3
+469.99
+2
+Cestny bicykel
+TRIBAN
+2
+559.99
+3
+Cestny bicykel
+Bianchi
+5
+1359.00
+4
+Horsky bicykel
+ROCKRIDER
+1
+1249.99
+5
+Horsky bicykel
+ROCKRIDER
+2
+949.99
+6
+Horsky bicykel
+BTWIN
+4
+399.99
+7
+Cyklisticka prilba
+Force
+6
+18.99
+8
+Cyklisticka prilba
+Bianchi
+3
+89.00
+9
+Cyklisticka prilba
+ROCKRIDER
+5
+27.99
+10
+Okuliare
+Force
+6
+13.99
+11
+Okuliare
+ROCKRIDER
+3
+50.99
+12
+Cyklodres
+TRIBAN
+5
+18.99
+13
+Cyklodres
+Force
+3
+32.99
+14
+Cyklodres
+TRIBAN
+10
+13.99
+15
+Cyklodres
+Bianchi
+5
+43.90
+16
+Cykloflasa
+ROCKRIDER
+4
+5.49
+17
+Cykloflasa
+BTWIN
+5
+2.79
+18
+Cykloflasa
+ELITE
+1
+4.99
+19
+Osvetlenie predne
+ELOPS
+3
+16.99
+20
+Osvetlenie predne
+Force
+5
+14.30
