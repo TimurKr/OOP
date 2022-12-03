@@ -1,14 +1,13 @@
 #include <QMainWindow>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QTreeWidgetItem>
 
 #include <iostream>
 #include <iomanip>
 
 #ifndef ESHOP_H
 #define ESHOP_H
-
-#define max_products_per_user 10
-
 
 #define FOUND 0
 #define NOT_FOUND 1
@@ -29,6 +28,7 @@ class Product
         QString manufacturer;
         unsigned int in_store;
         float price;
+
     public:
         // Constructors
         Product ()
@@ -58,20 +58,22 @@ class Product
 class Customer
 {
     private:
-        QString name, surname;
+        QString name;
         float budget;
-        unsigned int num_prod;
-        Product* products[max_products_per_user];
+        QVector<Product*> products;
+
     public:
         // Constructors
-        Customer(QString name, QString surname, float budget)
-        : name(name), surname(surname), budget(budget) {}
+        Customer(QString name, float budget)
+        : name(name), budget(budget) {}
 
-        bool add_product(Product* product);
+        QVector<Product*> cart() { return products; }
+        void remove_product(Product* product);
+        void add_product(Product* product, unsigned int amount);
 
-        bool canAfford(Product* product);
+        bool canAfford(Product* product, unsigned int amount);
 
-        bool finish();
+        void finish(QString fileName);
 
 };
 
@@ -82,17 +84,29 @@ class Eshop : public QMainWindow
     Q_OBJECT
 private:
     Ui::Eshop *ui;
-    QVector<Product *>products;
+    QVector<Product>products;
     unsigned int num_prod = 0;
+    Customer* customer;
 
 private slots:
     void on_actionOpen_triggered(bool checked);
 
+    void on_shop_clicked();
+
+    void on_search_clicked();
+
+    void on_product_tree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+
+    void on_add_to_cart_clicked();
+
+    void on_cart_tree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+    void on_remove_from_cart_clicked();
+    void on_checkout_clicked();
+
+
 public:
     Eshop(QWidget *parent = nullptr);
     ~Eshop();
-
-    bool read_database(string path_to_database);
 
     // Interface
     void printSaleInfo(unsigned int ID);
@@ -101,14 +115,18 @@ public:
 
     // Search
     Product* find_by_id(unsigned int id);
-    Product* find_by_name(string name);
-    Product* find_by_manufacturer(string manufacturer);
+    QVector<Product*> find_by_name(QString name);
+    QVector<Product*> find_by_manufacturer(QString manufacturer);
 
     // Shopping
     bool end();
     Product* pick_product();
-    void shop(Customer& customer);
 
+    // Visuals
+    void load_cart_tree(QVector<Product*> items);
+    void load_product_tree(QVector<Product> items);
+    void load_product_tree(QVector<Product*> items);
+    void load_product_detail(Product* product);
 
 };
 

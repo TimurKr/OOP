@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1137</width>
-    <height>728</height>
+    <width>960</width>
+    <height>571</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Meno</string>
+          <string>Name</string>
          </property>
         </widget>
        </item>
@@ -78,10 +78,20 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="budget_input"/>
+        <widget class="QDoubleSpinBox" name="budget_input">
+         <property name="suffix">
+          <string> €</string>
+         </property>
+         <property name="maximum">
+          <double>9999.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="shop_button">
+        <widget class="QPushButton" name="shop">
          <property name="text">
           <string>Shop</string>
          </property>
@@ -101,10 +111,20 @@
          <property name="title">
           <string>Our Products</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="search_text">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="4">
            <widget class="QTreeWidget" name="product_tree">
             <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="animated">
              <bool>false</bool>
             </property>
             <column>
@@ -132,6 +152,33 @@
               <string>Price</string>
              </property>
             </column>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="search_by">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <item>
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Manufacturer</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="search">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Search</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -184,19 +231,22 @@
              <item>
               <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>Budget left</string>
+                <string>Price</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="budget_left_spin">
+              <widget class="QDoubleSpinBox" name="price">
                <property name="enabled">
                 <bool>false</bool>
                </property>
+               <property name="maximum">
+                <double>100000.000000000000000</double>
+               </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="remove_from_cart_button">
+              <widget class="QPushButton" name="remove_from_cart">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -206,22 +256,12 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="clear_cart_button">
+              <widget class="QPushButton" name="checkout">
                <property name="enabled">
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>Empty Cart</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="checkout_button">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>Finish shopping</string>
+                <string>Checkout</string>
                </property>
               </widget>
              </item>
@@ -266,6 +306,15 @@
          <property name="enabled">
           <bool>false</bool>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>75</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximum">
+          <double>1000000.000000000000000</double>
+         </property>
         </widget>
        </item>
        <item>
@@ -276,9 +325,15 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="in_stock_show">
+        <widget class="QSpinBox" name="product_in_stock_show">
          <property name="enabled">
           <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -310,7 +365,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="add_to_cart_button">
+        <widget class="QPushButton" name="add_to_cart">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -329,8 +384,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1137</width>
-     <height>24</height>
+     <width>960</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

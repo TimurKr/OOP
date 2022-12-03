@@ -1,0 +1,10 @@
+Timko Kramar
+Položka: Cestny bicykel	Výrobca: TRIBAN		Cena: 469.99
+Položka: Cyklisticka prilba	Výrobca: Force		Cena: 18.99
+Položka: Cyklisticka prilba	Výrobca: Force		Cena: 18.99
+Položka: Cyklisticka prilba	Výrobca: Bianchi		Cena: 89
+Položka: Cykloflasa	Výrobca: ELITE		Cena: 4.99
+Položka: Horsky bicykel	Výrobca: ROCKRIDER		Cena: 1249.99
+
+Cena spolu: 1851.95
+Zostatok: 643.06

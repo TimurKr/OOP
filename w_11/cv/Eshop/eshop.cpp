@@ -10,58 +10,62 @@ void Product::setAll(unsigned int id, QString name, QString manufacturer, unsign
     this->price = price;
 }
 
-bool Customer::add_product(Product *product)
+void Customer::add_product(Product* product, unsigned int amount)
 {
-    if (num_prod == max_products_per_user)
+    for (int i = 0; i < amount; i++)
     {
-        return false;
+        products.append(product);
+        budget -= product->getPrice();
     }
-    if (product == nullptr)
-    {
-        return false;
-    }
-
-    products[num_prod++] = product;
-    budget -= product->getPrice();
-    return true;
 }
 
-bool Customer::canAfford(Product *product)
+void Customer::remove_product(Product* product)
 {
-    if (product->getPrice() <= budget)
+    for (int i = 0; i < products.length(); i++)
+    {
+        if (products[i]->getId() == product->getId())
+        {
+            products.remove(i);
+            return;
+        }
+    }
+}
+
+bool Customer::canAfford(Product *product, unsigned int amount)
+{
+    if (product->getPrice() * amount <= budget)
     {
         return true;
     }
     return false;
 }
 
-bool Customer::finish()
+void Customer::finish(QString fileName)
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Save file", "", "Txt Files (*.txt)");
 
-    if (fileName.isEmpty())
-    {
-        return;
-    }
+    if (fileName.isEmpty()) return;
+
 
     QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
 
-    f << name << " " << surname << endl;
+    QTextStream out(&file);
+
+    out << name << "\n";
 
     float suma = 0;
-    for (unsigned int prod = 0; prod < num_prod; prod++)
+    for (unsigned int prod = 0; prod < products.length(); prod++)
     {
         suma += products[prod]->getPrice();
 
-        f << "Položka: " << products[prod]->getName() << "\tVýrobca: " << products[prod]->getManufacturer() << "\t\tCena: " << products[prod]->getPrice() << endl;
+        out << "Položka: " << products[prod]->getName() << "\nVýrobca: " << products[prod]->getManufacturer() << "\nCena: " << products[prod]->getPrice() << "\n\n";
     }
 
-    f << endl;
-    f << "Cena spolu: " << suma << endl;
-    f << "Zostatok: " << budget << endl;
+    out << "\n";
+    out << "Cena spolu: " << suma << " €\n";
+    out << "Zostatok: " << budget << " €\n";
 
-    std::cout << "Blok si nájdete v dokumente " << path_to_bill << endl;
-    return true;
+    return;
 }
 
 
@@ -76,7 +80,6 @@ Eshop::~Eshop()
 {
     delete ui;
 }
-
 
 
 void Eshop::on_actionOpen_triggered(bool checked)
@@ -107,7 +110,7 @@ void Eshop::on_actionOpen_triggered(bool checked)
             continue;
         }
 
-        products[i]->setAll(line.toInt(),
+        products[i].setAll(line.toInt(),
                             data.readLine(),
                             data.readLine(),
                             data.readLine().toInt(),
@@ -115,77 +118,61 @@ void Eshop::on_actionOpen_triggered(bool checked)
     }
 
     file.close();
+
+    load_product_tree(products);
 }
 
-
-
-Product *Eshop::find_by_name(string search = "")
+QVector<Product*> Eshop::find_by_name(QString search)
 {
-    if (search.empty())
+
+    QVector<Product*> result;
+
+    if (search.isEmpty())
     {
-        return nullptr;
+        return result;
     }
 
     Product *p = nullptr;
-    for (unsigned int row = 0; row < num_prod; row++)
+    for (unsigned int i = 0; i < products.length(); i++)
     {
-        if (products[row].getName().find(search) != string::npos)
+        if (products[i].getName().contains(search))
         {
-            return &(products[row]);
+            result.append(&(products[i]));
         }
     }
-    return nullptr;
+    return result;
 }
 
-Product *Eshop::find_by_manufacturer(string search)
-{
-    if (search.empty())
+QVector<Product*> Eshop::find_by_manufacturer(QString search){
+
+    QVector<Product*> result;
+
+    if (search.isEmpty())
     {
-        return nullptr;
+        return result;
     }
 
     Product *p = nullptr;
-    for (unsigned int row = 0; row < num_prod; row++)
+    for (unsigned int i = 0; i < products.length(); i++)
     {
-        if (products[row].getManufacturer().find(search) != string::npos)
+        if (products[i].getManufacturer().contains(search))
         {
-            return &(products[row]);
+            result.append(&(products[i]));
+        }
+    }
+    return result;
+}
+
+Product* Eshop::find_by_id(unsigned int ID)
+{
+    for (unsigned int i = 0; i < products.length(); i++)
+    {
+        if (products[i].getId() == ID)
+        {
+            return &(products[i]);
         }
     }
     return nullptr;
-}
-
-Product *Eshop::find_by_id(unsigned int ID)
-{
-    if (ID == 0)
-    {
-        return nullptr;
-    }
-    for (unsigned int row = 0; row < num_prod; row++)
-    {
-        if (products[row].getId() == ID)
-        {
-            return &(products[row]);
-        }
-    }
-    return nullptr;
-}
-
-void Eshop::printSaleInfo(unsigned int ID)
-{
-    Product *p;
-    if (nullptr == (p = find_by_id(ID)))
-    {
-        std::cout << "Hladaniu nezodpovedajú žiadne produkty." << endl;
-        return;
-    }
-    std::cout << p->getName() << "\tID: " << p->getId() << "\tNa sklade: " << p->getInStore() << "\t\tCena: " << p->getPrice() << endl;
-    return;
-}
-
-void Eshop::setInStore(unsigned int ID, unsigned int new_in_store)
-{
-    find_by_id(ID)->setInStore(new_in_store);
 }
 
 bool Eshop::end()
@@ -206,92 +193,229 @@ bool Eshop::end()
     return end();
 }
 
-Product *Eshop::pick_product()
-{
-    char volba;
-    string search;
-    Product *product;
 
-    std::cout << "Výber produktu: - podľa názvu [1] - podľa výrobcu [2]" << endl
-              << "Zvolte hodnotu: ";
-    std::cin >> volba;
-    if (volba == '1')
+void Eshop::load_cart_tree(QVector<Product*> items)
+{
+    ui->cart_tree->setCurrentItem(nullptr);
+    ui->cart_tree->clear();
+    QTreeWidgetItem* parent = new QTreeWidgetItem(ui->cart_tree);
+    parent->setText(0, "Products");
+
+    for (size_t i = 0; i < items.size(); i++)
     {
-        std::cout << "Zadajte názov hladaného produktu: ";
-        std::cin >> search;
-        if ((product = find_by_name(search)) == nullptr)
-        {
-            std::cout << "Nenašli sa žiadne výsledky. Prajete si hladať znova? [y for yes]";
-            std::cin >> volba;
-            if (volba == 'y')
-            {
-                return pick_product();
-            }
-        }
-        else
-        {
-            return product;
-        }
+        QTreeWidgetItem* child = new QTreeWidgetItem();
+        child->setText(0, QString("%1").arg(items[i]->getId()));
+        child->setText(1, QString("%1").arg(items[i]->getName()));
+        child->setText(2, QString("%1").arg(items[i]->getManufacturer()));
+        child->setText(3, QString("%1ks").arg(items[i]->getInStore()));
+        child->setText(4, QStringLiteral("%1 €").arg(items[i]->getPrice()));
+
+        parent->addChild(child);
     }
-    else if (volba == '2')
+
+    ui->cart_tree->expandItem(parent);
+}
+
+void Eshop::load_product_tree(QVector<Product*> items)
+{
+    ui->product_tree->setCurrentItem(nullptr);
+    ui->product_tree->clear();
+    QTreeWidgetItem* parent = new QTreeWidgetItem(ui->product_tree);
+    parent->setText(0, "Products");
+
+    for (size_t i = 0; i < items.size(); i++)
     {
-        std::cout << "Zadajte výrobcu hladaného produktu: ";
-        std::cin >> search;
-        if ((product = find_by_manufacturer(search)) == nullptr)
-        {
-            std::cout << "Nenašli sa žiadne výsledky. Prajete si hladať znova? [y for yes]";
-            std::cin >> volba;
-            if (volba == 'y')
-            {
-                return pick_product();
-            }
-        }
-        else
-        {
-            return product;
-        }
+        QTreeWidgetItem* child = new QTreeWidgetItem();
+        child->setText(0, QString("%1").arg(items[i]->getId()));
+        child->setText(1, QString("%1").arg(items[i]->getName()));
+        child->setText(2, QString("%1").arg(items[i]->getManufacturer()));
+        child->setText(3, QString("%1ks").arg(items[i]->getInStore()));
+        child->setText(4, QStringLiteral("%1 €").arg(items[i]->getPrice()));
+
+        parent->addChild(child);
+    }
+
+    ui->product_tree->expandItem(parent);
+}
+
+void Eshop::load_product_tree(QVector<Product> items)
+{
+    ui->product_tree->setCurrentItem(nullptr);
+    ui->product_tree->clear();
+    QTreeWidgetItem* parent = new QTreeWidgetItem(ui->product_tree);
+    parent->setText(0, "Products");
+
+    for (size_t i = 0; i < items.size(); i++)
+    {
+        QTreeWidgetItem* child = new QTreeWidgetItem();
+        child->setText(0, QString("%1").arg(items[i].getId()));
+        child->setText(1, QString("%1").arg(items[i].getName()));
+        child->setText(2, QString("%1").arg(items[i].getManufacturer()));
+        child->setText(3, QString("%1 ks").arg(items[i].getInStore()));
+        child->setText(4, QStringLiteral("%1 €").arg(items[i].getPrice()));
+
+        parent->addChild(child);
+    }
+
+    ui->product_tree->expandItem(parent);
+}
+
+void Eshop::load_product_detail(Product* product)
+{
+    if (product != nullptr)
+    {
+        ui->product_name_show->setText(product->getName());
+        ui->product_price_show->setValue(product->getPrice());
+        ui->product_in_stock_show->setValue(product->getInStore());
+
+        ui->amount_spin->setValue(1);
+        ui->amount_spin->setEnabled(true);
+        ui->add_to_cart->setEnabled(true);
     }
     else
     {
-        std::cout << "Nesprávna volba. Prajete si pokračovať vo výbere produktu? [y for yes]";
-        std::cin >> volba;
-        if (volba == 'y')
-        {
-            return pick_product();
-        }
-    }
+        ui->product_name_show->setText(QString(""));
+        ui->product_price_show->setValue(0.0);
+        ui->product_in_stock_show->setValue(0);
 
-    return nullptr;
+        ui->amount_spin->setValue(0);
+        ui->amount_spin->setEnabled(false);
+        ui->add_to_cart->setEnabled(false);
+    }
 }
 
-void Eshop::shop(Customer &customer)
+void Eshop::on_shop_clicked()
 {
-    Product *product;
-    char volba;
-    while (true)
+    if (ui->name_input->text().isEmpty())
     {
-        product = pick_product();
-        if (product != nullptr)
-        {
-            printSaleInfo(product->getId());
-            std::cout << "Prajete si zakúpiť daný produkt? [y for yes]";
-            std::cin >> volba;
-            if (volba == 'y')
-            {
-                if (customer.canAfford(product))
-                {
-                    customer.add_product(product);
-                    setInStore(product->getId(), product->getInStore() - 1);
-                }
-                else
-                {
-                    std::cout << "Nedostatok prostriedkov" << endl;
-                }
-            }
-        }
-        if (end())
-        {
-            return;
-        }
+        QMessageBox msgBox;
+        msgBox.setText(QString("Zadajte meno"));
+        msgBox.exec();
+        return;
+    }
+
+    customer = new Customer(ui->name_input->text(), ui->budget_input->value());
+
+    ui->name_input->setEnabled(false);
+    ui->budget_input->setEnabled(false);
+    ui->product_tree->setEnabled(true);
+    ui->search->setEnabled(true);
+    ui->search_by->setEnabled(true);
+    ui->cart_tree->setEnabled(true);
+    ui->checkout->setEnabled(true);
+    ui->shop->setEnabled(false);
+
+    load_product_tree(products);
+}
+
+void Eshop::on_search_clicked()
+{
+    if (ui->search_text->text().isEmpty())
+    {
+        load_product_tree(products);
+    }
+    else if (ui->search_by->currentText() == QString("Name"))
+    {
+        load_product_tree(find_by_name(ui->search_text->text()));
+    }
+    else if (ui->search_by->currentText() == QString("Manufacturer"))
+    {
+        load_product_tree(find_by_manufacturer(ui->search_text->text()));
+    }
+    else
+    {
+        throw 1;
     }
 }
+
+void Eshop::on_product_tree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
+{
+    if (current == nullptr) return;
+    load_product_detail(find_by_id(current->text(0).toInt()));
+    ui->add_to_cart->setEnabled(true);
+    ui->amount_spin->setEnabled(true);
+}
+
+void Eshop::on_add_to_cart_clicked()
+{
+    if (ui->product_tree->currentItem() == nullptr) return;
+    Product* product = find_by_id(ui->product_tree->currentItem()->text(0).toInt());
+    if (product == nullptr) return;
+
+    unsigned int amount = ui->amount_spin->value();
+
+    if (amount > product->getInStore())
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QString("Nedostatok na sklade."));
+        msgBox.exec();
+        return;
+    }
+    if (!customer->canAfford(product, amount))
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QString("Produkt je príliš drahý."));
+        msgBox.exec();
+        return;
+    }
+    customer->add_product(product, amount);
+    product->setInStore(product->getInStore() - amount);
+    ui->budget_input->setValue(ui->budget_input->value() - amount * product->getPrice());
+    ui->price->setValue(ui->price->value() + amount * product->getPrice());
+
+    load_cart_tree(customer->cart());
+    load_product_tree(products);
+
+    if (!customer->cart().isEmpty())
+    {
+        ui->checkout->setEnabled(true);
+    }
+    return;
+}
+
+void Eshop::on_cart_tree_currentItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous)
+{
+    if (current != nullptr)
+    {
+        ui->remove_from_cart->setEnabled(true);
+    }
+}
+
+void Eshop::on_remove_from_cart_clicked()
+{
+    QTreeWidgetItem* item = ui->cart_tree->currentItem();
+    if(item == nullptr) return;
+
+
+    Product* product = find_by_id(item->text(0).toInt());
+
+    ui->budget_input->setValue(ui->budget_input->value() + product->getPrice());
+    ui->price->setValue(ui->price->value() - product->getPrice());
+
+    customer->remove_product(product);
+    product->setInStore(product->getInStore() + 1);
+
+    load_cart_tree(customer->cart());
+    load_product_tree(products);
+}
+
+void Eshop::on_checkout_clicked()
+{
+
+    QMessageBox msgBox;
+    msgBox.setText(QString("Zvolte si miesto uloženia bloku."));
+    msgBox.exec();
+
+    customer->finish(QFileDialog::getSaveFileName(this, "Save file", "", "Txt Files (*.txt)"));
+
+    msgBox.setText(QString("Ďakujeme za nákup."));
+    msgBox.exec();
+    return;
+}
+
+
+
+
+
+
+
